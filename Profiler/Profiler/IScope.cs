@@ -1,6 +1,6 @@
 ﻿namespace Profiler
 {
-    interface IScope
+    public interface IScope
     {
         /// <summary>
         /// Start the scope
