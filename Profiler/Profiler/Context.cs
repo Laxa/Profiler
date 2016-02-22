@@ -16,7 +16,12 @@ namespace Profiler
         // We are going to use this as a lock in case of multi-threading
         private static object syncRoot = new Object();
 
-        private Context() { }
+        private IList<Scope> Scopes { get; set; }
+
+        private Context()
+        {
+            Scopes = new List<Scope>();
+        }
 
         public static Context Instance
         {
@@ -34,6 +39,23 @@ namespace Profiler
             }
         }
 
+        public IScope GetScope(string name) => Scopes.Where(x => x.Name.Equals(name)).FirstOrDefault();
 
+        public IScope GetLastScope() => Scopes.Last();
+
+        public void CloseScope(string name) => Scopes.Where(x => x.Name.Equals(name)).FirstOrDefault()?.Close();
+
+        public void CloseScope(IScope scope) => Scopes.Where(x => x.Equals(scope)).FirstOrDefault()?.Close();
+
+        public void CloseScope() => Scopes.LastOrDefault()?.Close();
+
+        public IScope AddNewScopeAndStartIt(string name)
+        {
+            Scope scope = (Scope)GetScope(name);
+            if (scope == null)
+                scope = new Scope(name);
+            scope.Start();
+            return scope;
+        }
     }
 }
