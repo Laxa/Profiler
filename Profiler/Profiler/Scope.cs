@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Profiler
 {
@@ -14,31 +15,42 @@ namespace Profiler
 
         public bool Closed { get; private set; }
 
-        public IList<long> Mesures { get; private set; }
+        private object syncRoot = new object();
 
         public Scope(string name)
         {
-            Closed = false;
-            Mesures = new List<long>();
-            Name = name;
-            Timer = new Stopwatch();
+            lock (syncRoot)
+            {
+                Closed = false;
+                Name = name;
+                Timer = new Stopwatch();
+            }
         }
 
         public void Close()
         {
-            Timer.Stop();
-            Closed = true;
+            lock (syncRoot)
+            {
+                Timer.Stop();
+                Closed = true;
+            }
         }
 
         public void Start()
         {
-            Timer.Start();
+            lock (syncRoot)
+            {
+                Closed = false;
+                Timer.Start();
+            }
         }
 
         public void Stop()
         {
-            Timer.Stop();
-            Mesures.Add(Timer.ElapsedMilliseconds);
+            lock (syncRoot)
+            {
+                Timer.Stop();
+            }
         }
     }
 }
