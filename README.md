@@ -1,2 +1,2 @@
 # Profiler
-School project for ETNA
+School project
